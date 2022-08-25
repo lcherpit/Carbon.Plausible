@@ -101,6 +101,7 @@ class ReverseProxyController extends ActionController
     public function apiEventAction(): string
     {
         $url = $this->backendUrl . '/api/event';
+        $this->post->addAutomaticRequestHeader('User-Agent', $this->getClientUA());
         $response = $this->post->request(
             $url,
             'POST',
@@ -127,6 +128,18 @@ class ReverseProxyController extends ActionController
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
         return $_SERVER['REMOTE_ADDR'];
+    }
+
+    /**
+     * Get Client User-Agent if any
+     * Note that the context is only available after processRequest() has been called.
+     *
+     * @return string
+     */
+    private function getClientUA(): string
+    {
+        $userAgent = $this->getControllerContext()->getRequest()->getHttpRequest()->getHeader('User-Agent');
+        return $userAgent !== [] ? $userAgent[0] : '';
     }
 
     /**
